@@ -15,15 +15,15 @@ def read_tiff(path):
         images.append(np.array(img))
     return np.array(images)
 
-def load_image(df_features, transform):
+def load_image(df_features, transform, datapath1, datapath2):
     transformed_images = []
     transformed_features = []
     transformed_features2 = []
     for path in df_features['rescaled_2D_single_cell_tiff_path']:
         filename = os.path.basename(path)
-        local_image_path = os.path.join('/vinserver_user/huyenle1607/AISCData/Fish1/rescaled_2D_single_cell_tiff_path', filename)
+        local_image_path = os.path.join(datapath1, filename)
         if not os.path.exists(local_image_path):
-              local_image_path = os.path.join('/vinserver_user/huyenle1607/AISCData/Fish2/rescaled_2D_single_cell_tiff_path', filename)
+              local_image_path = os.path.join(datapath2, filename)
         if local_image_path:
             if os.path.exists(local_image_path):  
                 images = read_tiff(local_image_path)
