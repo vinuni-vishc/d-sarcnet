@@ -28,6 +28,7 @@ def load_image(df_features, transform, datapath1, datapath2):
             if os.path.exists(local_image_path):  
                 images = read_tiff(local_image_path)
                 image = images[1]
+                image_copy = image.copy()
 
                 image = cv2.resize(image, (224,224)) #uint8
                 
@@ -39,8 +40,11 @@ def load_image(df_features, transform, datapath1, datapath2):
                 clr_matrix = cv2.resize(clr_matrix, (224, 224))
                 clr_matrix = clr_matrix / 5
                 
-                magnitude = np.load(os.path.join('/vinserver_user/khietdang/data/datasetA/grad_matrix', filename) + '.npy')
-                #magnitude = (magnitude - np.min(magnitude)) / (np.max(magnitude) - np.min(magnitude))
+                gX = cv2.Sobel(image_copy, cv2.CV_64F, 1, 0)
+                gY = cv2.Sobel(image_copy, cv2.CV_64F, 0, 1)
+                magnitude = np.sqrt((gX ** 2) + (gY ** 2))
+                magnitude = magnitude / (magnitude.max() - magnitude.min())
+                magnitude = cv2.resize(magnitude_norm, (224,224))
                 
                 #feature_matrix = np.stack((magnitude, magnitude, magnitude, magnitude), axis=0)
                 feature_matrix2 = np.stack((fft_matrix, clr_matrix, magnitude), axis=0)
