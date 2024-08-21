@@ -30,7 +30,6 @@ def fft_calculation(im, size, step):
 def load_image(df_features, transform, datapath1, datapath2):
     transformed_images = []
     transformed_features = []
-    transformed_features2 = []
     for path in df_features['rescaled_2D_single_cell_tiff_path']:
         filename = os.path.basename(path)
         local_image_path = os.path.join(datapath1, filename)
@@ -58,8 +57,6 @@ def load_image(df_features, transform, datapath1, datapath2):
                 magnitude = magnitude / (magnitude.max() - magnitude.min())
                 magnitude = cv2.resize(magnitude_norm, (224,224))
                 
-                #feature_matrix = np.stack((magnitude, magnitude, magnitude, magnitude), axis=0)
-                feature_matrix2 = np.stack((fft_matrix, clr_matrix, magnitude), axis=0)
                 feature_matrix = np.stack((fft_matrix, clr_matrix, magnitude, magnitude), axis=0)
 
                 image = np.repeat(np.expand_dims(image, axis=2), repeats=3, axis=2)
@@ -67,9 +64,7 @@ def load_image(df_features, transform, datapath1, datapath2):
                 transformed_images.append(image)
 
                 feature_matrix = torch.tensor(feature_matrix)
-                feature_matrix2 = torch.tensor(feature_matrix2)
                 transformed_features.append(feature_matrix.float())
-                transformed_features2.append(feature_matrix2.float())
 
     return torch.stack(transformed_images), torch.stack(transformed_features)
 
