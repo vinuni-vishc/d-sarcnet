@@ -15,6 +15,18 @@ def read_tiff(path):
         images.append(np.array(img))
     return np.array(images)
 
+def fft_cal(im):
+    fft = np.fft.fft2(im)
+    return np.sum(np.abs(fft) ** 2)
+
+def fft_calculation(im, size, step):
+    fft_matrix = np.zeros((im.shape[0] // step + 1, im.shape[1] // step + 1))
+    for i in range(0, im.shape[0], step):
+        for j in range(0, im.shape[1], step):
+            im_copy = copy.deepcopy(im)
+            im_dat = __get_patch__(im_copy, (i, j), window_size=size)
+            fft_matrix[int(i // step), int(j // step)] = fft_cal(im_dat)
+
 def load_image(df_features, transform, datapath1, datapath2):
     transformed_images = []
     transformed_features = []
@@ -32,7 +44,7 @@ def load_image(df_features, transform, datapath1, datapath2):
 
                 image = cv2.resize(image, (224,224)) #uint8
                 
-                fft_matrix = np.load(os.path.join('/vinserver_user/khietdang/data/datasetA/fft_new', filename) + '.npy')
+                fft_matrix = fft_calculation(image_copy, size=96, step=8)
                 fft_matrix = cv2.resize(fft_matrix, (224, 224))
                 fft_matrix = (fft_matrix - np.min(fft_matrix)) / (np.max(fft_matrix) - np.min(fft_matrix))
                 
